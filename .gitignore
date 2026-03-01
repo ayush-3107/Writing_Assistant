@@ -1,0 +1,8 @@
+data.txt
+models/gru_autocomplete_sentencepiece_v2.h5
+models/sentencepiece_autocomplete_v2.model
+models/sentencepiece_autocomplete_v2.vocab
+extra/
+__pycache__/
+*.pyc
+main.py
