@@ -5,4 +5,3 @@ models/sentencepiece_autocomplete_v2.vocab
 extra/
 __pycache__/
 *.pyc
-main.py

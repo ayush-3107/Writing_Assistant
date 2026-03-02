@@ -5,7 +5,7 @@ import re
 # -----------------------------
 # Load grammar correction model
 # -----------------------------
-MODEL_NAME = "vennify/t5-base-grammar-correction"
+MODEL_NAME = "prithivida/grammar_error_correcter_v1"
 
 tokenizer = T5Tokenizer.from_pretrained(MODEL_NAME)
 model = T5ForConditionalGeneration.from_pretrained(MODEL_NAME)
@@ -47,6 +47,9 @@ def correct_grammar(text: str) -> str:
         outputs[0],
         skip_special_tokens=True
     )
+# 🔥 CLEAN PREFIX
+    if corrected_text.lower().startswith("grammar:"):
+        corrected_text = corrected_text[len("grammar:"):].strip()
 
     return corrected_text
 
