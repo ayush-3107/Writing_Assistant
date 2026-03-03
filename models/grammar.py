@@ -24,7 +24,7 @@ def correct_grammar(text: str) -> str:
     if not text or text.strip() == "":
         return text
 
-    input_text = "grammar: " + text
+    input_text =text
 
     inputs = tokenizer(
         input_text,
@@ -37,19 +37,19 @@ def correct_grammar(text: str) -> str:
 
     with torch.no_grad():
         outputs = model.generate(
-            **inputs,
-            max_new_tokens=128,
-            num_beams=5,
-            early_stopping=True
-        )
+        **inputs,
+        max_new_tokens=50,            # Reduced from 128
+        num_beams=5,                  # Slightly smaller
+        repetition_penalty=1.5,       # Prevent looping
+        no_repeat_ngram_size=3,       # Block repeated phrases
+        early_stopping=True
+)
 
     corrected_text = tokenizer.decode(
         outputs[0],
         skip_special_tokens=True
     )
-# 🔥 CLEAN PREFIX
-    if corrected_text.lower().startswith("grammar:"):
-        corrected_text = corrected_text[len("grammar:"):].strip()
+
 
     return corrected_text
 
@@ -75,6 +75,22 @@ def fix_capitalization(text: str) -> str:
     )
 
     return text
+
+# Post Processing
+def smart_postprocess(text: str) -> str:
+    # Fix standalone lowercase "i"
+    text = re.sub(r'\bi\b', 'I', text)
+
+    # Fix spacing before punctuation
+    text = re.sub(r'\s+([,.!?])', r'\1', text)
+
+    # Ensure space after punctuation
+    text = re.sub(r'([,.!?])([A-Za-z])', r'\1 \2', text)
+
+    # Fix multiple spaces
+    text = re.sub(r'\s+', ' ', text)
+
+    return text.strip()
 
 # -----------------------------
 # Sentence-wise correction
@@ -103,6 +119,8 @@ def correct_long_text(text: str) -> str:
 
     # Remove repeated punctuation (e.g., ".." -> ".")
     corrected_text = re.sub(r'([.!?])\1+', r'\1', corrected_text)
+    # Smart post-processing for spacing and standalone "I"
+    corrected_text = smart_postprocess(corrected_text)
 
     # Ensure paragraph ends with a period
     if not corrected_text.endswith("."):
